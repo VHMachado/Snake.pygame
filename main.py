@@ -6,7 +6,25 @@ class SNAKE:
         self.body = [Vector2(5,10), Vector2(4,10), Vector2(3,10)]
         self.direction = Vector2(1,0)
         self.grow_snake = False
-    
+
+        self.head_up = pygame.image.load('Graphics/head_up.png').convert_alpha()
+        self.head_down = pygame.image.load('Graphics/head_down.png').convert_alpha()
+        self.head_right = pygame.image.load('Graphics/head_right.png').convert_alpha()
+        self.head_left = pygame.image.load('Graphics/head_left.png').convert_alpha()
+
+        self.tail_up = pygame.image.load('Graphics/tail_up.png').convert_alpha()
+        self.tail_down = pygame.image.load('Graphics/tail_down.png').convert_alpha()
+        self.tail_right = pygame.image.load('Graphics/tail_right.png').convert_alpha()
+        self.tail_left = pygame.image.load('Graphics/tail_left.png').convert_alpha()
+
+        self.body_vertical = pygame.image.load('Graphics/body_vertical.png').convert_alpha()
+        self.body_horizontal = pygame.image.load('Graphics/body_horizontal.png').convert_alpha()
+
+        self.body_tr = pygame.image.load('Graphics/body_tr.png').convert_alpha()
+        self.body_tl = pygame.image.load('Graphics/body_tl.png').convert_alpha()
+        self.body_br = pygame.image.load('Graphics/body_br.png').convert_alpha()
+        self.body_bl = pygame.image.load('Graphics/body_bl.png').convert_alpha()
+
     def draw_snake(self):
         for block in self.body:
             x = int(block.x * cell_size)
@@ -31,6 +49,7 @@ class SNAKE:
 class FRUIT:
     def __init__(self):
         self.randomize_position()
+        self.apple = pygame.image.load('Graphics/apple.png').convert_alpha()
 
     def draw_fruit(self):
         x = int(self.pos.x * cell_size)
@@ -38,7 +57,12 @@ class FRUIT:
         w = h = cell_size
         fruit_rect_size = (x, y, w, h)
         fruit_rect = pygame.Rect(fruit_rect_size)
-        pygame.draw.rect(screen, (126,166,114), fruit_rect)
+
+        screen.blit(self.apple, fruit_rect)
+
+        # Draw the apple as an rectangle
+        # pygame.draw.rect(screen, (126,166,114), fruit_rect)
+
 
     def randomize_position(self):
         self.x = random.randint(0, cell_number - 1)
@@ -67,6 +91,10 @@ class MAIN:
     def check_game_over(self):
         if not 0 <= self.snake.body[0].x < cell_number or not 0 <= self.snake.body[0].y < cell_number:
             self.game_over()
+
+        for block in self.snake.body[1:]:
+            if block == self.snake.body[0]:
+                self.game_over()
     
     def game_over(self):
         pygame.quit()
@@ -88,6 +116,10 @@ clock = pygame.time.Clock()
 framerate = 60
 
 game = MAIN()
+UP = Vector2(0,-1)
+DOWN = Vector2(0, 1)
+RIGHT = Vector2(1,0)
+LEFT = Vector2(-1,0)
 
 while True:
     for event in pygame.event.get():
@@ -98,13 +130,17 @@ while True:
             game.update()
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_UP:
-                game.snake.direction = Vector2(0,-1)
+                if game.snake.body[0] + UP != game.snake.body[1]:
+                    game.snake.direction = UP
             if event.key == pygame.K_DOWN:
-                game.snake.direction = Vector2(0,1)
+                if game.snake.body[0] + DOWN != game.snake.body[1]:
+                    game.snake.direction = DOWN
             if event.key == pygame.K_RIGHT:
-                game.snake.direction = Vector2(1,0)
+                if game.snake.body[0] + RIGHT != game.snake.body[1]:
+                    game.snake.direction = RIGHT
             if event.key == pygame.K_LEFT:
-                game.snake.direction = Vector2(-1,0)
+                if game.snake.body[0] + LEFT != game.snake.body[1]:
+                    game.snake.direction = LEFT
                 
     screen.fill((175,215,70))
     game.draw_elements()
