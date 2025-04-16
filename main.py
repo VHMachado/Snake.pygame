@@ -41,9 +41,10 @@ class SNAKE:
             if index == 0:
                 self.update_head_graphics(snake_rect)
             elif index == len(self.body) - 1:
-                self.upadate_tail_graphics(snake_rect)
+                self.update_tail_graphics(snake_rect)
             else:
-                pygame.draw.rect(screen, (183,111,122), snake_rect)
+                self.update_body_graphics(snake_rect, index, block)
+                # pygame.draw.rect(screen, (183,111,122), snake_rect)
             
 
     def update_head_graphics(self, rect):
@@ -52,12 +53,22 @@ class SNAKE:
         elif self.direction == self.RIGHT: screen.blit(self.head_right, rect)
         elif self.direction == self.LEFT: screen.blit(self.head_left, rect)
                 
-    def upadate_tail_graphics(self, rect):
+    def update_tail_graphics(self, rect):
         tail_relation = self.body[-1] - self.body[-2]
         if tail_relation == self.UP: screen.blit(self.tail_up, rect)
         elif tail_relation == self.DOWN: screen.blit(self.tail_down, rect)
         elif tail_relation == self.RIGHT: screen.blit(self.tail_right, rect)
         elif tail_relation == self.LEFT: screen.blit(self.tail_left, rect)
+
+    def update_body_graphics(self, rect, index, block):
+        previous_block = self.body[index + 1] - block
+        next_block = self.body[index - 1] - block
+        if previous_block.x == next_block.x: screen.blit(self.body_vertical, rect)
+        elif previous_block.y == next_block.y: screen.blit(self.body_horizontal, rect)
+        else: self.update_body_corner_graphics(previous_block, next_block, block, rect)
+    
+    def update_body_corner_graphics(self, previous_block, next_block, block, rect):
+        if next_block.x == -1 and previous_block.y == -1 or next_block.y == -1 and previous_block.x == -1: screen.blit(self.body_tl, rect)
 
     def move_snake(self):
         if self.grow_snake == True:
