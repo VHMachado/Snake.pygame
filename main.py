@@ -48,10 +48,11 @@ class SNAKE:
             
 
     def update_head_graphics(self, rect):
-        if self.direction == self.UP: screen.blit(self.head_up, rect)
-        elif self.direction == self.DOWN: screen.blit(self.head_down, rect)
-        elif self.direction == self.RIGHT: screen.blit(self.head_right, rect)
-        elif self.direction == self.LEFT: screen.blit(self.head_left, rect)
+        head_relation = self.body[0] - self.body[1]
+        if head_relation == self.UP: screen.blit(self.head_up, rect)
+        elif head_relation == self.DOWN: screen.blit(self.head_down, rect)
+        elif head_relation == self.RIGHT: screen.blit(self.head_right, rect)
+        elif head_relation == self.LEFT: screen.blit(self.head_left, rect)
                 
     def update_tail_graphics(self, rect):
         tail_relation = self.body[-1] - self.body[-2]
@@ -71,7 +72,7 @@ class SNAKE:
         if next_block.x == -1 and previous_block.y == -1 or next_block.y == -1 and previous_block.x == -1: screen.blit(self.body_tl, rect)
         elif next_block.x == 1 and previous_block.y == 1 or next_block.y == 1 and previous_block.x == 1: screen.blit(self.body_br, rect)
         elif next_block.x == 1 and previous_block.y == -1 or next_block.y == -1 and previous_block.x == 1: screen.blit(self.body_tr, rect)
-        else: screen.blit(self.body_bl, rect)
+        elif next_block.x == -1 and previous_block.y == 1 or next_block.y == 1 and previous_block.x == -1: screen.blit(self.body_bl, rect)
         
     def move_snake(self):
         if self.grow_snake == True:
