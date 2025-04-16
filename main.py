@@ -69,7 +69,10 @@ class SNAKE:
     
     def update_body_corner_graphics(self, previous_block, next_block, block, rect):
         if next_block.x == -1 and previous_block.y == -1 or next_block.y == -1 and previous_block.x == -1: screen.blit(self.body_tl, rect)
-
+        elif next_block.x == 1 and previous_block.y == 1 or next_block.y == 1 and previous_block.x == 1: screen.blit(self.body_br, rect)
+        elif next_block.x == 1 and previous_block.y == -1 or next_block.y == -1 and previous_block.x == 1: screen.blit(self.body_tr, rect)
+        else: screen.blit(self.body_bl, rect)
+        
     def move_snake(self):
         if self.grow_snake == True:
             body_copy = self.body[:]
