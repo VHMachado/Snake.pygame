@@ -4,7 +4,7 @@ from pygame.math import Vector2
 class SNAKE:
     def __init__(self):
         self.body = [Vector2(5,10), Vector2(4,10), Vector2(3,10)]
-        self.direction = Vector2(1,0)
+        self.direction = Vector2(0,0)
         self.grow_snake = False
 
         self.UP = Vector2(0,-1)
@@ -30,6 +30,8 @@ class SNAKE:
         self.body_br = pygame.image.load('Graphics/body_br.png').convert_alpha()
         self.body_bl = pygame.image.load('Graphics/body_bl.png').convert_alpha()
 
+        self.crunch_sound = pygame.mixer.Sound('./Sound/crunch.wav')
+
     def draw_snake(self):
         for index, block in enumerate(self.body):
             x = int(block.x * cell_size)
@@ -44,9 +46,7 @@ class SNAKE:
                 self.update_tail_graphics(snake_rect)
             else:
                 self.update_body_graphics(snake_rect, index, block)
-                # pygame.draw.rect(screen, (183,111,122), snake_rect)
             
-
     def update_head_graphics(self, rect):
         head_relation = self.body[0] - self.body[1]
         if head_relation == self.UP: screen.blit(self.head_up, rect)
@@ -86,6 +86,13 @@ class SNAKE:
     def add_block(self):
         self.grow_snake = True
 
+    def play_crunch_sound(self):
+        self.crunch_sound.play()
+
+    def reset(self):
+        self.body = [Vector2(5,10), Vector2(4,10), Vector2(3,10)]
+        self.direction = Vector2(0,0)
+
 class FRUIT:
     def __init__(self):
         self.randomize_position()
@@ -100,10 +107,6 @@ class FRUIT:
 
         screen.blit(self.apple, fruit_rect)
 
-        # Draw the apple as an rectangle
-        # pygame.draw.rect(screen, (126,166,114), fruit_rect)
-
-
     def randomize_position(self):
         self.x = random.randint(0, cell_number - 1)
         self.y = random.randint(0, cell_number - 1)
@@ -113,6 +116,7 @@ class MAIN:
     def __init__(self):
         self.snake = SNAKE()
         self.fruit = FRUIT()
+        self.game_font = pygame.font.Font('./Font/PoetsenOne-Regular.ttf', 25)
 
     def update(self):
         self.snake.move_snake()
@@ -120,13 +124,53 @@ class MAIN:
         self.check_game_over()
 
     def draw_elements(self):
+        self.draw_grass()
         self.fruit.draw_fruit()
         self.snake.draw_snake()
+        self.draw_score()
 
     def check_collision(self):
         if self.fruit.pos == self.snake.body[0]:
             self.fruit.randomize_position()
             self.snake.add_block()
+            self.snake.play_crunch_sound()
+
+            for block in self.snake.body[1:]:
+                if block == self.fruit.pos:
+                    self.fruit.randomize_position()
+
+    def draw_grass(self):
+        grass_color = (167, 209, 61)
+        for row in range(cell_number):
+            if row % 2 == 0:
+                for col in range(cell_number):
+                    if col % 2 == 0:
+                        x = int(col * cell_size)
+                        y = int(row * cell_size)
+                        w = h = cell_size
+                        grass_rect_size = (x, y, w, h)
+                        grass_rect = pygame.Rect(grass_rect_size)
+                        pygame.draw.rect(screen, grass_color, grass_rect)
+            else:
+                for col in range(cell_number):
+                    if col % 2 != 0:
+                        x = int(col * cell_size)
+                        y = int(row * cell_size)
+                        w = h = cell_size
+                        grass_rect_size = (x, y, w, h)
+                        grass_rect = pygame.Rect(grass_rect_size)
+                        pygame.draw.rect(screen, grass_color, grass_rect)
+
+    def draw_score(self):
+        # The score is the snake body's length minus three, it's base size 
+        score = str(len(self.snake.body) - 3)
+        score_surface = self.game_font.render(f'Score: {score}', True, (56, 74, 12))
+
+        x = int(cell_size * cell_number - 60)
+        y = int(cell_size * cell_number - 20)
+
+        score_rect = score_surface.get_rect(center = (x, y))
+        screen.blit(score_surface, score_rect)
 
     def check_game_over(self):
         if not 0 <= self.snake.body[0].x < cell_number or not 0 <= self.snake.body[0].y < cell_number:
@@ -137,9 +181,9 @@ class MAIN:
                 self.game_over()
     
     def game_over(self):
-        pygame.quit()
-        sys.exit()
+        self.snake.reset()
 
+pygame.mixer.pre_init(44100, -16, 2, 512)
 pygame.init()
 
 cell_size = 30
