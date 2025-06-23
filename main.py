@@ -124,10 +124,23 @@ class MAIN:
         self.check_game_over()
 
     def draw_elements(self):
+        screen.fill((175,215,70))
         self.draw_grass()
         self.fruit.draw_fruit()
         self.snake.draw_snake()
         self.draw_score()
+
+    def draw_menu_screen(self):
+        screen.fill((175,215,70))
+        self.draw_grass()
+        game_name_surf = self.game_font.render('Snake', True, (56, 74, 12))
+
+        x = int(cell_size * cell_number / 2)
+        y = cell_size * cell_number / 4.5
+
+        game_name_rect = game_name_surf.get_rect(center = (x, y))
+        screen.blit(game_name_surf, game_name_rect)
+
 
     def check_collision(self):
         if self.fruit.pos == self.snake.body[0]:
@@ -201,6 +214,10 @@ framerate = 60
 
 game = MAIN()
 
+menu_screen = True
+run_game = False
+game_over_screen = False
+
 while True:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
@@ -221,8 +238,17 @@ while True:
             if event.key == pygame.K_LEFT:
                 if game.snake.body[0] + game.snake.LEFT != game.snake.body[1]:
                     game.snake.direction = game.snake.LEFT
-                
-    screen.fill((175,215,70))
-    game.draw_elements()
-    pygame.display.update()
-    clock.tick(framerate)
+
+    if menu_screen:
+        game.draw_menu_screen()
+        pygame.display.update()
+        clock.tick(framerate)
+
+    elif run_game:   
+        game.draw_elements()
+        pygame.display.update()
+        clock.tick(framerate)
+
+    elif game_over_screen:
+        pass
+        
